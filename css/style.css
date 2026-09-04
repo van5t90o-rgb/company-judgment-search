@@ -26,3 +26,38 @@ a{color:#1757c2;text-decoration:none}a:hover{text-decoration:underline}
 .judicial-item .text{min-width:0}.judicial-item small{display:block;color:#64748b;margin-top:4px}
 footer{text-align:center;color:#64748b;font-size:13px;padding:25px;line-height:1.8}
 @media(max-width:650px){.search-row{flex-direction:column}button{width:100%}.title-row,.judicial-item{align-items:flex-start;flex-direction:column}}
+
+.judicial-note{margin:10px 0 16px;padding:12px 14px;border-radius:10px;background:#f7f7f7;color:#444;line-height:1.7}
+.judicial-flow{display:flex;flex-direction:column;gap:10px}
+.judicial-step{display:flex;gap:14px;align-items:flex-start;padding:16px;border:1px solid #ddd;border-radius:12px;background:#fff}
+.judicial-step.fallback{background:#fafafa}
+.step-no{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#222;color:#fff;font-weight:700;flex:none}
+.step-body{display:flex;flex-direction:column;gap:7px;min-width:0}
+.step-body b{font-size:16px}
+.step-body small{color:#666;word-break:break-all}
+.judicial-btn{display:inline-block;width:max-content;max-width:100%;padding:9px 14px;border-radius:8px;text-decoration:none;font-weight:600}
+.judicial-btn.primary{background:#222;color:#fff}
+.judicial-btn.secondary{border:1px solid #999;color:#222;background:#fff}
+.judicial-arrow{text-align:center;color:#777;font-size:14px;padding:2px}
+
+
+/* 裁判書內嵌結果區 */
+.judicial-panel{border:1px solid #dbe3ef;border-radius:14px;background:#fff;overflow:hidden}
+.judicial-toolbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 18px;border-bottom:1px solid #e5eaf1;background:#fbfdff}
+.judicial-query-title{font-size:18px;font-weight:800;color:#183a72}
+.judicial-query-keyword{margin-top:5px;color:#64748b;word-break:break-all}
+.judicial-actions{display:flex;gap:8px;flex-wrap:wrap}
+.judicial-tab{border:1px solid #cbd5e1;background:#fff;color:#1e3a5f;padding:8px 14px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer}
+.judicial-tab:hover{background:#f1f5f9}
+.judicial-tab.active{background:#2563eb;border-color:#2563eb;color:#fff}
+.judicial-status{padding:10px 18px;background:#f8fafc;color:#475569;font-size:14px;border-bottom:1px solid #e5e7eb}
+.judicial-frame-wrap{height:760px;background:#fff;position:relative}
+#judicialFrame{width:100%;height:100%;border:0;display:block;background:#fff}
+.judicial-fallback{padding:12px 18px;border-top:1px solid #e5e7eb;background:#fafafa;color:#64748b;font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.judicial-fallback a{font-weight:700}
+@media(max-width:760px){
+  .judicial-toolbar{align-items:flex-start;flex-direction:column}
+  .judicial-actions{width:100%}
+  .judicial-tab{flex:1}
+  .judicial-frame-wrap{height:720px}
+}
