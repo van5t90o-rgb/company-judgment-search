@@ -42,90 +42,6 @@ function formatDate(v){
   return s;
 }
 
-function renderJudicial(data){
-  const c = data.company || data;
-  const name = (c.Company_Name || "").trim();
-  const rep = (c.Responsible_Name || "").trim();
-  const area = $("judicialLinks");
-  area.innerHTML = "";
-
-  const panel = document.createElement("div");
-  panel.className = "judicial-panel";
-  panel.innerHTML = `
-    <div class="judicial-toolbar">
-      <div>
-        <div class="judicial-query-title" id="judicialQueryTitle">公司名稱相關案件</div>
-        <div class="judicial-query-keyword" id="judicialQueryKeyword">${esc(name || "—")}</div>
-      </div>
-      <div class="judicial-actions">
-        <button type="button" class="judicial-tab active" id="searchCompanyJudgment">查公司名稱</button>
-        <button type="button" class="judicial-tab" id="searchRepJudgment">查代表人</button>
-      </div>
-    </div>
-
-    <div class="judicial-status" id="judicialStatus">
-      正在載入司法院裁判書查詢結果……
-    </div>
-
-    <div class="judicial-frame-wrap">
-      <iframe
-        id="judicialFrame"
-        title="司法院裁判書查詢結果"
-        loading="eager"
-        referrerpolicy="no-referrer"
-        src="about:blank"></iframe>
-    </div>
-
-    <div class="judicial-fallback">
-      <span>如果司法院網站禁止嵌入顯示：</span>
-      <a id="judicialOpenExternal" target="_blank" rel="noopener">在新視窗開啟司法院結果</a>
-    </div>
-  `;
-  area.appendChild(panel);
-
-  const frame = $("judicialFrame");
-  const title = $("judicialQueryTitle");
-  const keyword = $("judicialQueryKeyword");
-  const status = $("judicialStatus");
-  const external = $("judicialOpenExternal");
-  const companyBtn = $("searchCompanyJudgment");
-  const repBtn = $("searchRepJudgment");
-
-  // 使用司法院公開查詢頁；結果直接嵌入目前網站，不再只顯示「開啟查詢」。
-  function makeUrl(q){
-    return APP_CONFIG.JUDGMENT_MOBILE_BASE + encodeURIComponent(q || "");
-  }
-
-  function loadJudgment(type){
-    const isCompany = type === "company";
-    const q = isCompany ? name : rep;
-    const label = isCompany ? "公司名稱" : "代表人";
-
-    title.textContent = `${label}相關案件`;
-    keyword.textContent = q || "—";
-    status.textContent = q
-      ? `正在載入司法院：${label}「${q}」……`
-      : `沒有可用的${label}查詢關鍵字。`;
-
-    companyBtn.classList.toggle("active", isCompany);
-    repBtn.classList.toggle("active", !isCompany);
-
-    const url = makeUrl(q);
-    external.href = url;
-    frame.src = url;
-  }
-
-  frame.addEventListener("load", () => {
-    status.textContent = "司法院裁判書查詢結果已載入。若畫面被司法院瀏覽器安全政策阻擋，請使用下方「在新視窗開啟司法院結果」。";
-  });
-
-  companyBtn.addEventListener("click", () => loadJudgment("company"));
-  repBtn.addEventListener("click", () => loadJudgment("representative"));
-
-  // 第一順位永遠先查公司名稱；只有使用者確認公司名稱無結果時，再切換代表人。
-  loadJudgment("company");
-}
-
 function renderCompany(data){
   $("companySection").classList.remove("hidden");
   const c=data.company || data;
@@ -156,7 +72,41 @@ function renderCompany(data){
     }
   }
 
-  renderJudicial(data);
+  // 裁判書查詢規則：
+  // 1. 第一順位只查公司名稱。
+  // 2. 公司名稱查不到後，才查代表人。
+  // 注意：司法院官方查詢頁屬於不同網域，GitHub Pages 無法讀取其結果頁內容，
+  // 因此瀏覽器不能安全地自動判斷「0 筆結果」；本頁會先開公司名稱查詢，
+  // 並在本頁提供「查代表人」作為第二順位，不會一開始混合兩個關鍵字。
+  const j=$("judicialLinks");
+  j.innerHTML="";
+
+  const name=(c.Company_Name || "").trim();
+  const rep=(c.Responsible_Name || "").trim();
+  const companyUrl=APP_CONFIG.JUDGMENT_BASE+encodeURIComponent(name);
+  const repUrl=APP_CONFIG.JUDGMENT_BASE+encodeURIComponent(rep);
+
+  const box=document.createElement("div");
+  box.className="judicial-flow";
+  box.innerHTML=`
+    <div class="judicial-step active">
+      <div class="step-no">1</div>
+      <div class="step-body">
+        <b>先查公司名稱</b>
+        <small>${esc(name || "—")}</small>
+        <a class="judicial-btn primary" target="_blank" rel="noopener" href="${companyUrl}">查詢公司名稱相關裁判書</a>
+      </div>
+    </div>
+    <div class="judicial-arrow">↓ 公司名稱查無結果，再進行下一步</div>
+    <div class="judicial-step fallback">
+      <div class="step-no">2</div>
+      <div class="step-body">
+        <b>再查代表人</b>
+        <small>${esc(rep || "—")}</small>
+        <a class="judicial-btn secondary" target="_blank" rel="noopener" href="${repUrl}">查詢代表人相關裁判書</a>
+      </div>
+    </div>`;
+  j.appendChild(box);
 }
 
 function repoInfo(){
