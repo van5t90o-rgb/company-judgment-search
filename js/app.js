@@ -72,20 +72,41 @@ function renderCompany(data){
     }
   }
 
+  // 裁判書查詢規則：
+  // 1. 第一順位只查公司名稱。
+  // 2. 公司名稱查不到後，才查代表人。
+  // 注意：司法院官方查詢頁屬於不同網域，GitHub Pages 無法讀取其結果頁內容，
+  // 因此瀏覽器不能安全地自動判斷「0 筆結果」；本頁會先開公司名稱查詢，
+  // 並在本頁提供「查代表人」作為第二順位，不會一開始混合兩個關鍵字。
   const j=$("judicialLinks");
   j.innerHTML="";
-  const name=c.Company_Name || "";
-  const rep=c.Responsible_Name || "";
-  [
-    ["公司名稱相關案件",name],
-    ["代表人相關案件",rep]
-  ].forEach(([title,keyword])=>{
-    const row=document.createElement("div");
-    row.className="judicial-item";
-    row.innerHTML=`<div class="text"><b>${esc(title)}</b><small>${esc(keyword)}</small></div>
-      <a target="_blank" rel="noopener" href="${APP_CONFIG.JUDGMENT_BASE+encodeURIComponent(keyword)}">開啟司法院查詢</a>`;
-    j.appendChild(row);
-  });
+
+  const name=(c.Company_Name || "").trim();
+  const rep=(c.Responsible_Name || "").trim();
+  const companyUrl=APP_CONFIG.JUDGMENT_BASE+encodeURIComponent(name);
+  const repUrl=APP_CONFIG.JUDGMENT_BASE+encodeURIComponent(rep);
+
+  const box=document.createElement("div");
+  box.className="judicial-flow";
+  box.innerHTML=`
+    <div class="judicial-step active">
+      <div class="step-no">1</div>
+      <div class="step-body">
+        <b>先查公司名稱</b>
+        <small>${esc(name || "—")}</small>
+        <a class="judicial-btn primary" target="_blank" rel="noopener" href="${companyUrl}">查詢公司名稱相關裁判書</a>
+      </div>
+    </div>
+    <div class="judicial-arrow">↓ 公司名稱查無結果，再進行下一步</div>
+    <div class="judicial-step fallback">
+      <div class="step-no">2</div>
+      <div class="step-body">
+        <b>再查代表人</b>
+        <small>${esc(rep || "—")}</small>
+        <a class="judicial-btn secondary" target="_blank" rel="noopener" href="${repUrl}">查詢代表人相關裁判書</a>
+      </div>
+    </div>`;
+  j.appendChild(box);
 }
 
 function repoInfo(){
@@ -102,17 +123,8 @@ function repoInfo(){
 
 function showSync(taxId){
   const box=$("syncBox");
-  const info=repoInfo();
-  if(!info || !info.repo){
-    box.classList.remove("hidden");
-    box.innerHTML=`查無此公司本地資料。請先在 GitHub Actions 執行 <b>Sync Company</b>，輸入統一編號 ${esc(taxId)}。`;
-    return;
-  }
-  const url=`https://github.com/${encodeURIComponent(info.owner)}/${encodeURIComponent(info.repo)}/actions/workflows/sync-company.yml`;
   box.classList.remove("hidden");
-  box.innerHTML=`目前 GitHub Repository 尚未有 ${esc(taxId)} 的資料。<br>
-    請點 <a href="${url}" target="_blank" rel="noopener">GitHub Actions → Sync Company</a>，
-    按 Run workflow，輸入 ${esc(taxId)}。完成後重新整理本頁即可。`;
+  box.innerHTML=`目前 GitHub 資料庫沒有統一編號 <b>${esc(taxId)}</b> 的公司資料。請確認背景資料同步後再查詢。`;
 }
 
 async function search(){
