@@ -1,63 +1,60 @@
-# 台灣公司／法院裁判書查詢網站
+# 企業資料 × 法院裁判書查詢平台 V2
 
-## 功能
-1. 輸入 8 碼統一編號查詢公司資料。
-2. 顯示公司名稱、代表人、資本額、地址、登記機關、設立日期、最後變更日期等。
-3. 顯示所營事業資料。
-4. 取得公司名稱與代表人後，查詢法院裁判書。
-5. 顯示裁判書列表與詳細內容。
-6. GitHub Pages 可部署前端；API 憑證留在後端環境變數。
+## 你要的完整流程
 
-## 重要
-GitHub Pages 是純前端靜態網站，不能安全保存司法院 API 帳密。
-本專案預設：
-- 前端：GitHub Pages
-- 後端：Vercel Functions
-- 公司資料：經濟部商業發展署公開資料 API
-- 裁判書：司法院裁判書開放 API（需依官方規定申請/設定）
+統一編號
+→ 公司基本資料
+→ 所營事業資料
+→ 自動以「公司名稱」與「代表人姓名」搜尋司法院裁判書
+→ 合併去重
+→ 顯示法院、案號、日期、案由、當事人、主文、理由、完整裁判內容
+→ 可開啟官方裁判書來源
 
-## 1. GitHub 建立 Repository
-建立一個新的 GitHub repository，例如：
-`company-judgment-search`
+## 架構
 
-把本專案內容上傳到 repository。
+- GitHub Pages：前端 HTML/CSS/JavaScript
+- Vercel Functions：後端 API
+- 經濟部商業發展署：公司登記 API
+- 司法院裁判書系統：裁判書公開查詢
+- 司法院裁判書 Open API：如果設定會員帳號密碼，詳細全文優先使用官方 JDoc API
 
-## 2. 部署前端 GitHub Pages
-GitHub：
-Settings → Pages → Build and deployment
+## GitHub Pages
 
-選：
-`GitHub Actions`
+Repository → Settings → Pages → Source = GitHub Actions。
 
-本專案已附 `.github/workflows/deploy.yml`。
+本專案已包含：
+`.github/workflows/pages.yml`
 
-部署完成後會得到：
-`https://你的GitHub帳號.github.io/company-judgment-search/`
+## Vercel
 
-## 3. 部署 API
-推薦使用 Vercel。
-
-將整個 repository 匯入 Vercel。
-
-Environment Variables：
-- `JUDICIAL_API_BASE`
-- `JUDICIAL_API_USERNAME`
-- `JUDICIAL_API_PASSWORD`
-
-請依司法院最新 API 文件填入實際值。
-
-## 4. 設定前端 API 網址
-在 `js/config.js`：
+1. 在 Vercel Import Git Repository。
+2. Framework Preset 選 Other。
+3. 不需要 Build Command。
+4. Deploy。
+5. 如果 Vercel 網址不是與 GitHub Pages 同網域，修改 `js/config.js`：
 
 ```js
 window.APP_CONFIG = {
-  API_BASE_URL: "https://你的-vercel-api.vercel.app"
+  API_BASE_URL: "https://你的-project.vercel.app"
 };
 ```
 
-如果前端與 API 使用相同網域，也可以留空。
+## Vercel Environment Variables（司法院 Open API）
 
-## 5. 本機測試
+可設定：
+
+- `JUDICIAL_API_USER`
+- `JUDICIAL_API_PASSWORD`
+
+這兩個值不要放 GitHub。
+
+司法院 114.08.22 API 規格：
+- Auth: POST https://data.judicial.gov.tw/jdg/api/Auth
+- JDoc: POST https://data.judicial.gov.tw/jdg/api/JDoc
+
+若未設定會員帳密，網站仍會使用司法院公開裁判書查詢頁搜尋案件；詳細內容從官方公開裁判書頁面取得。
+
+## 本機
 
 ```bash
 npm install
@@ -65,16 +62,19 @@ npm run dev
 ```
 
 ## API
-`/api/company?taxId=統一編號`
 
-例如：
+GET `/api/company?taxId=20828393`
 
-`/api/company?taxId=12345678`
+回傳：
+- company
+- businessItems
+- judgments
+- judgmentSearch
 
-回傳公司資料與裁判書資料。
+## 注意
 
-## 注意事項
-- 公司資料與裁判書均應以官方公開資料為準。
-- 「查無裁判書」不代表公司或個人沒有任何司法事件，只代表目前查詢條件/公開資料沒有取得結果。
-- 出現在裁判書中不代表當事人有違法或有罪。
-- 正式上線前請確認各官方 API 的最新服務規範、頻率限制與使用條款。
+1. 公司資料以經濟部商業發展署公開資料為準。
+2. 裁判書結果以司法院公開系統為準。
+3. 裁判書中出現某公司或某人，不代表該公司/人違法或有罪。
+4. 公開裁判書可能因司法院資料更新、移除、遮蔽或系統限制而變動。
+5. 不要將司法院帳號密碼提交到 GitHub。
