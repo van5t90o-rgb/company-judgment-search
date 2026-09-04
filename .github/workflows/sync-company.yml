@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tax_id:
-        description: "8碼統一編號"
+        description: "42833103"
         required: true
         type: string
 
