@@ -1,6 +1,6 @@
 window.APP_CONFIG = {
-  GCIS_API_BASE: "https://data.gcis.nat.gov.tw/od/data/api",
-  COMPANY_API_ID: "5F64D864-61CB-4D0D-8AD9-492047CC1EA6",
-  BUSINESS_API_ID: "236EE382-4942-41A9-BD03-CA0709025E7C",
-  JUDICIAL_SEARCH_BASE: "https://judgment.judicial.gov.tw/FJUD/qryresult.aspx"
+  DATA_BASE: "data/companies/",
+  FIND_BIZ_BASE: "https://findbiz.nat.gov.tw/fts/query/QueryBar/queryInit.do?banNo=",
+  JUDGMENT_BASE: "https://judgment.judicial.gov.tw/FJUD/qryresult.aspx?judtype=JUDBOOK&kw=",
+  SYNC_WORKFLOW: ".github/workflows/sync-company.yml"
 };

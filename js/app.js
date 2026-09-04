@@ -1,11 +1,12 @@
 const $ = id => document.getElementById(id);
 
-const fields = [
+const FIELDS = [
   ["統一編號","Business_Accounting_NO"],
   ["登記現況","Company_Status_Desc"],
   ["公司名稱","Company_Name"],
   ["章程所訂外文公司名稱","Company_Name_En"],
   ["資本總額(元)","Capital_Stock_Amount"],
+  ["實收資本額(元)","Paid_In_Capital_Amount"],
   ["代表人姓名","Responsible_Name"],
   ["公司所在地","Company_Location"],
   ["登記機關","Register_Organization_Desc"],
@@ -14,78 +15,137 @@ const fields = [
   ["完成勞動權益講習","Labor_Rights_Training"]
 ];
 
-function valueOf(o,key){
-  const v=o?.[key];
-  return v === null || v === undefined || v === "" ? "—" : String(v);
+function esc(v){
+  return String(v ?? "—").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
 }
 
-function renderCompany(company){
+function companyPath(taxId){
+  return `${APP_CONFIG.DATA_BASE}${taxId.slice(0,2)}/${taxId}.json`;
+}
+
+async function loadCompany(taxId){
+  const r = await fetch(companyPath(taxId), {cache:"no-store"});
+  if(r.status === 404) return null;
+  if(!r.ok) throw new Error(`GitHub 資料讀取失敗 HTTP ${r.status}`);
+  return await r.json();
+}
+
+function formatDate(v){
+  if(!v) return "—";
+  const s=String(v);
+  if(/^\d{7}$/.test(s)){
+    const y=Number(s.slice(0,3))+1911;
+    return `${y}/${s.slice(3,5)}/${s.slice(5,7)}`;
+  }
+  return s;
+}
+
+function renderCompany(data){
   $("companySection").classList.remove("hidden");
+  const c=data.company || data;
   const grid=$("companyGrid");
   grid.innerHTML="";
-  for(const [label,key] of fields){
+  for(const [label,key] of FIELDS){
+    let v=c[key];
+    if(key.includes("Date")) v=formatDate(v);
     const div=document.createElement("div");
     div.className="item";
-    div.innerHTML=`<b>${label}</b><span>${escapeHtml(valueOf(company,key))}</span>`;
+    div.innerHTML=`<b>${esc(label)}</b><span>${esc(v ?? "—")}</span>`;
     grid.appendChild(div);
   }
-  renderBusiness(company.__business || []);
-  renderJudicialLinks(company);
+
+  $("officialCompanyLink").href=APP_CONFIG.FIND_BIZ_BASE+encodeURIComponent(c.Business_Accounting_NO || "");
+
+  const business=data.business || [];
+  const b=$("businessItems");
+  b.innerHTML="";
+  if(!business.length){
+    b.innerHTML="<div class='business-item'>目前沒有同步到所營事業資料。</div>";
+  }else{
+    for(const x of business){
+      const div=document.createElement("div");
+      div.className="business-item";
+      div.innerHTML=`<b>${esc(x.Business_Item || "")}</b>${esc(x.Business_Item_Desc || "")}`;
+      b.appendChild(div);
+    }
+  }
+
+  const j=$("judicialLinks");
+  j.innerHTML="";
+  const name=c.Company_Name || "";
+  const rep=c.Responsible_Name || "";
+  [
+    ["公司名稱相關案件",name],
+    ["代表人相關案件",rep]
+  ].forEach(([title,keyword])=>{
+    const row=document.createElement("div");
+    row.className="judicial-item";
+    row.innerHTML=`<div class="text"><b>${esc(title)}</b><small>${esc(keyword)}</small></div>
+      <a target="_blank" rel="noopener" href="${APP_CONFIG.JUDGMENT_BASE+encodeURIComponent(keyword)}">開啟司法院查詢</a>`;
+    j.appendChild(row);
+  });
 }
 
-function renderBusiness(items){
-  const box=$("businessItems");
-  box.innerHTML="";
-  if(!items.length){
-    box.textContent="查無所營事業資料，或官方 API 暫時未提供。";
+function repoInfo(){
+  // GitHub Pages 標準網址：https://OWNER.github.io/REPOSITORY/
+  const host=location.hostname;
+  const path=location.pathname.split("/").filter(Boolean);
+  if(host.endsWith(".github.io")){
+    const owner=host.split(".")[0];
+    const repo=path[0] || "";
+    return {owner,repo};
+  }
+  return null;
+}
+
+function showSync(taxId){
+  const box=$("syncBox");
+  const info=repoInfo();
+  if(!info || !info.repo){
+    box.classList.remove("hidden");
+    box.innerHTML=`查無此公司本地資料。請先在 GitHub Actions 執行 <b>Sync Company</b>，輸入統一編號 ${esc(taxId)}。`;
     return;
   }
-  for(const x of items){
-    const div=document.createElement("div");
-    div.className="business-item";
-    const item=x.Business_Item || x.Business_Item_Desc || "";
-    const desc=x.Business_Item_Desc || "";
-    div.innerHTML=`<b>${escapeHtml(item)}</b><div>${escapeHtml(desc)}</div>`;
-    box.appendChild(div);
-  }
+  const url=`https://github.com/${encodeURIComponent(info.owner)}/${encodeURIComponent(info.repo)}/actions/workflows/sync-company.yml`;
+  box.classList.remove("hidden");
+  box.innerHTML=`目前 GitHub Repository 尚未有 ${esc(taxId)} 的資料。<br>
+    請點 <a href="${url}" target="_blank" rel="noopener">GitHub Actions → Sync Company</a>，
+    按 Run workflow，輸入 ${esc(taxId)}。完成後重新整理本頁即可。`;
 }
 
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-}
-
-async function doSearch(){
+async function search(){
   const taxId=$("taxId").value.trim();
-  const status=$("status");
-  status.className="status";
+  $("syncBox").classList.add("hidden");
+  $("companySection").classList.add("hidden");
+  $("status").className="status";
 
   if(!/^\d{8}$/.test(taxId)){
-    status.textContent="請輸入正確的 8 碼統一編號。";
-    status.classList.add("error");
-    return;
+    $("status").textContent="請輸入正確的 8 碼統一編號。";
+    $("status").classList.add("error"); return;
   }
 
-  status.textContent="正在查詢經濟部官方資料……";
-  status.classList.add("loading");
-  $("companySection").classList.add("hidden");
+  $("status").textContent="正在讀取 GitHub 公司資料……";
+  $("status").classList.add("loading");
 
   try{
-    const result=await fetchCompany(taxId);
-    if(!result){
-      status.textContent="查無此統一編號。";
-      status.classList.add("error");
+    const data=await loadCompany(taxId);
+    if(!data){
+      $("status").textContent="此統編尚未同步到 GitHub 資料庫。";
+      $("status").className="status error";
+      showSync(taxId);
       return;
     }
-    result.company.__business=result.business;
-    renderCompany(result.company);
-    status.textContent="查詢完成。";
-    status.className="status success";
+    renderCompany(data);
+    $("status").textContent="查詢完成。資料由 GitHub Pages 本地 JSON 提供。";
+    $("status").className="status success";
   }catch(e){
     console.error(e);
-    status.textContent=e.message || "查詢失敗。";
-    status.classList.add("error");
+    $("status").textContent=e.message || "查詢失敗。";
+    $("status").className="status error";
   }
 }
 
-$("searchBtn").addEventListener("click",doSearch);
-$("taxId").addEventListener("keydown",e=>{if(e.key==="Enter")doSearch();});
+$("searchBtn").addEventListener("click",search);
+$("taxId").addEventListener("keydown",e=>{if(e.key==="Enter")search();});

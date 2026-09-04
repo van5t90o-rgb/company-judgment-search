@@ -1,44 +1,49 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>台灣公司暨裁判書查詢</title>
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>台灣公司暨裁判書查詢</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <header>
-  <h1>台灣公司暨裁判書查詢</h1>
-  <p>公司資料來自經濟部商業發展署；裁判書連結至司法院官方系統。</p>
+  <div class="brand">台灣公司暨裁判書查詢</div>
+  <div class="subtitle">公司登記資料 × 所營事業 × 法院裁判書</div>
 </header>
 
 <main>
   <section class="search-card">
-    <label for="taxId">統一編號</label>
+    <label for="taxId">輸入統一編號</label>
     <div class="search-row">
-      <input id="taxId" maxlength="8" inputmode="numeric" placeholder="請輸入 8 碼統一編號">
+      <input id="taxId" maxlength="8" inputmode="numeric" autocomplete="off" placeholder="例如：24283627">
       <button id="searchBtn">查詢</button>
     </div>
     <div id="status" class="status"></div>
+    <div id="syncBox" class="sync-box hidden"></div>
   </section>
 
   <section id="companySection" class="card hidden">
-    <h2>公司基本資料</h2>
+    <div class="title-row">
+      <h2>公司基本資料</h2>
+      <a id="officialCompanyLink" target="_blank" rel="noopener">經濟部官方查詢</a>
+    </div>
     <div id="companyGrid" class="grid"></div>
 
     <h2>所營事業資料</h2>
     <div id="businessItems"></div>
 
-    <h2>司法院裁判書查詢</h2>
+    <h2>法院裁判書</h2>
     <div id="judicialLinks"></div>
-    <p class="hint">司法院公開查詢系統會在官方網站顯示搜尋結果；本 GitHub Pages 版本不使用第三方代理伺服器。</p>
   </section>
 </main>
 
-<footer>GitHub Pages 純前端版本</footer>
+<footer>
+  <div>GitHub Pages 純前端版本</div>
+  <div>公司資料來源：經濟部商業發展署；裁判書查詢：司法院官方系統</div>
+</footer>
+
 <script src="js/config.js"></script>
-<script src="js/company-api.js"></script>
-<script src="js/judicial.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

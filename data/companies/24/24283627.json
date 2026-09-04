@@ -1,0 +1,58 @@
+{
+  "company": {
+    "Business_Accounting_NO": "24283627",
+    "Company_Status_Desc": "核准設立",
+    "Company_Name": "瑞峯汽車材料有限公司",
+    "Company_Name_En": "",
+    "Capital_Stock_Amount": "250000",
+    "Paid_In_Capital_Amount": "",
+    "Responsible_Name": "何至峰",
+    "Company_Location": "新北市中和區景平路239巷47號",
+    "Register_Organization_Desc": "新北市政府",
+    "Company_Setup_Date": "0971223",
+    "Change_Of_Approval_Data": "1120713",
+    "Labor_Rights_Training": ""
+  },
+  "business": [
+    {
+      "Business_Item": "F106010",
+      "Business_Item_Desc": "五金批發業"
+    },
+    {
+      "Business_Item": "F114010",
+      "Business_Item_Desc": "汽車批發業"
+    },
+    {
+      "Business_Item": "F114020",
+      "Business_Item_Desc": "機車批發業"
+    },
+    {
+      "Business_Item": "F114030",
+      "Business_Item_Desc": "汽、機車零件配備批發業"
+    },
+    {
+      "Business_Item": "F206010",
+      "Business_Item_Desc": "五金零售業"
+    },
+    {
+      "Business_Item": "F214010",
+      "Business_Item_Desc": "汽車零售業"
+    },
+    {
+      "Business_Item": "F214020",
+      "Business_Item_Desc": "機車零售業"
+    },
+    {
+      "Business_Item": "F214030",
+      "Business_Item_Desc": "汽、機車零件配備零售業"
+    },
+    {
+      "Business_Item": "ZZ99999",
+      "Business_Item_Desc": "除許可業務外，得經營法令非禁止或限制之業務"
+    }
+  ],
+  "source": {
+    "company": "經濟部商業發展署公司登記公開資料",
+    "note": "GitHub Pages 測試資料；可由 GitHub Actions 重新同步官方資料。"
+  }
+}
