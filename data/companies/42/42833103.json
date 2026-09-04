@@ -1,0 +1,28 @@
+{
+  "company": {
+    "Business_Accounting_NO": "42833103",
+    "Company_Status_Desc": "解散",
+    "Company_Name": "福邸餐飲顧問股份有限公司",
+    "Capital_Stock_Amount": 4000000,
+    "Paid_In_Capital_Amount": 4000000,
+    "Share_Val": 10,
+    "Equity_Amt": 400000,
+    "Responsible_Name": "",
+    "Company_Location": "臺北市中正區忠孝東路1段76號12樓之1",
+    "Register_Organization_Desc": "臺北市政府",
+    "Company_Setup_Date": "1041215",
+    "Change_Of_Approval_Data": "1070214",
+    "Revoke_App_Date": "1080417",
+    "Case_Status": "",
+    "Case_Status_Desc": "",
+    "Sus_App_Date": "",
+    "Sus_Beg_Date": "",
+    "Sus_End_Date": ""
+  },
+  "business": [],
+  "source": {
+    "company": "經濟部商業發展署公司登記基本資料-應用一",
+    "business": "經濟部商業發展署公司登記基本資料-應用三",
+    "synced_at": "2026-09-04T12:54:23.377499+00:00"
+  }
+}
