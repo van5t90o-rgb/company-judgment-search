@@ -1,0 +1,34 @@
+*{box-sizing:border-box}
+body{margin:0;background:#f4f6f8;color:#17202a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",Arial,sans-serif}
+.topbar{background:#17202a;color:white;padding:22px 24px}
+.brand{font-size:24px;font-weight:700}.sub{opacity:.72;margin-top:5px}
+.container{max-width:1100px;margin:30px auto;padding:0 18px}
+.search-panel,.card{background:white;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.06);padding:25px;margin-bottom:22px}
+h1,h2{margin:0 0 10px}.hint{color:#697586}
+.search-row{display:flex;gap:10px}
+input{flex:1;padding:14px 16px;border:1px solid #cbd5e1;border-radius:9px;font-size:18px}
+button{border:0;border-radius:9px;padding:12px 24px;background:#2563eb;color:white;font-size:16px;font-weight:600;cursor:pointer}
+button:hover{opacity:.9}
+.message{margin-top:12px;color:#b42318}
+.hidden{display:none!important}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.badge{padding:5px 10px;border-radius:999px;background:#e7f6ec;color:#137333;font-size:13px}
+.data-grid{display:grid;grid-template-columns:180px 1fr;border-top:1px solid #e5e7eb}
+.data-grid .label,.data-grid .value{padding:13px 10px;border-bottom:1px solid #e5e7eb}
+.data-grid .label{font-weight:700;background:#f8fafc}
+.business-item{padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;margin:8px 0}
+.judgment{border:1px solid #e2e8f0;border-radius:10px;padding:17px;margin:12px 0}
+.judgment-title{font-size:18px;font-weight:700}
+.meta{color:#667085;font-size:14px;margin:7px 0}
+.view-btn{margin-top:8px;background:#475569}
+.count{color:#475569}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);padding:30px;overflow:auto}
+.modal-box{background:white;max-width:900px;margin:auto;padding:28px;border-radius:14px;position:relative}
+.modal-close{position:absolute;right:15px;top:12px;padding:5px 12px;background:#64748b;font-size:24px}
+.modal-body{white-space:pre-wrap;line-height:1.8}
+footer{text-align:center;color:#667085;padding:25px}
+@media(max-width:650px){
+ .search-row{flex-direction:column}.search-row button{width:100%}
+ .data-grid{grid-template-columns:1fr}.data-grid .label{border-bottom:0;padding-bottom:4px}.data-grid .value{padding-top:4px}
+ .container{margin-top:18px}
+}
